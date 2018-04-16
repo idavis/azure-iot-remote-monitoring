@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob.Logging;
 using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob.SimulatorCore.Devices;
-using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob.SimulatorCore.Logging;
 
 namespace Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob
 {
@@ -25,13 +25,12 @@ namespace Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob
             }
         }
 
-        private readonly ILogger _logger;
+        private readonly ILog _logger = LogProvider.GetCurrentClassLogger();
         private readonly CancellationToken _token;
         private readonly Dictionary<string, TaskDetail> _tasks;
 
-        public DeviceManager(ILogger logger, CancellationToken token)
+        public DeviceManager(CancellationToken token)
         {
-            _logger = logger;
             _token = token;
 
             _tasks = new Dictionary<string, TaskDetail>();
@@ -55,7 +54,7 @@ namespace Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob
 
         public IEnumerable<string> GetLiveDevices()
         {
-            _logger.LogInfo($"{_tasks.Count} devices were started");
+            _logger.Info($"{_tasks.Count} devices were started");
             var completedTasks = _tasks
                 .Where(pair => pair.Value.Task.IsCompleted)
                 .ToList();
@@ -64,11 +63,11 @@ namespace Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob
             {
                 if (pair.Value.Task.IsFaulted)
                 {
-                    _logger.LogWarning($"Device {pair.Key} shut down due to fault");
+                    _logger.Warn($"Device {pair.Key} shut down due to fault");
                 }
                 else
                 {
-                    _logger.LogInfo($"Device {pair.Key} shut down as expected");
+                    _logger.Info($"Device {pair.Key} shut down as expected");
                 }
 
                 _tasks.Remove(pair.Key);
@@ -77,7 +76,7 @@ namespace Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob
             var devices = _tasks.Keys.ToList();
             foreach (var device in devices)
             {
-                _logger.LogInfo($"Device {device} is still running");
+                _logger.Info($"Device {device} is still running");
             }
 
             return devices;
@@ -97,7 +96,7 @@ namespace Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob
                     task.CancellationTokenSource.Cancel();
                     _tasks.Remove(deviceId);
 
-                    _logger.LogInfo("********** STOPPED DEVICE : {0} ********** ", deviceId);
+                    _logger.InfoFormat("********** STOPPED DEVICE : {0} ********** ", deviceId);
                 }
             }
         }
@@ -110,7 +109,7 @@ namespace Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob
             foreach (var pair in _tasks)
             {
                 pair.Value.CancellationTokenSource.Cancel();
-                _logger.LogInfo("********** STOPPED DEVICE : {0} ********** ", pair.Key);
+                _logger.InfoFormat("********** STOPPED DEVICE : {0} ********** ", pair.Key);
             }
 
             _tasks.Clear();

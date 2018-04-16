@@ -1,19 +1,18 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob.Logging;
 using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob.SimulatorCore.Devices;
-using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob.SimulatorCore.Logging;
 using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob.SimulatorCore.Telemetry;
 
 namespace Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob.Cooler.Telemetry
 {
     public class StartupTelemetry : ITelemetry
     {
-        private readonly ILogger _logger;
+        private readonly ILog _logger = LogProvider.GetCurrentClassLogger();
         private readonly IDevice _device;
-        
-        public StartupTelemetry(ILogger logger, IDevice device)
+
+        public StartupTelemetry(IDevice device)
         {
-            _logger = logger;
             _device = device;
         }
 
@@ -21,7 +20,7 @@ namespace Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob
         {
             if (!token.IsCancellationRequested)
             {
-                _logger.LogInfo("Sending initial data for device {0}", _device.DeviceID);
+                _logger.InfoFormat("Sending initial data for device {0}", _device.DeviceID);
                 await sendMessageAsync(_device.GetDeviceInfo());
             }
         }

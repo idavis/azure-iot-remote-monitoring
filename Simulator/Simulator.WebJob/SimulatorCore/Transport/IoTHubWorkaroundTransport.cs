@@ -7,8 +7,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Common.Configurations;
 using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Common.Helpers;
+using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob.Logging;
 using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob.SimulatorCore.Devices;
-using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob.SimulatorCore.Logging;
 using Microsoft.Azure.Devices.Client;
 using Microsoft.Azure.Devices.Shared;
 using Newtonsoft.Json;
@@ -23,7 +23,7 @@ namespace Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob
 
     class IoTHubWorkaroundTransport : ITransport
     {
-        private readonly ILogger _logger;
+        private readonly ILog _logger = LogProvider.GetCurrentClassLogger();
         private readonly IConfigurationProvider _configurationProvider;
         private readonly IDevice _device;
         private readonly string _connectionString;
@@ -38,9 +38,8 @@ namespace Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob
         private LinkedList<TwinCollection> _reports = new LinkedList<TwinCollection>();
         private List<Client.Message> _messages = new List<Client.Message>();
 
-        public IoTHubWorkaroundTransport(ILogger logger, IConfigurationProvider configurationProvider, IDevice device)
+        public IoTHubWorkaroundTransport(IConfigurationProvider configurationProvider, IDevice device)
         {
-            _logger = logger;
             _configurationProvider = configurationProvider;
             _device = device;
 
@@ -180,7 +179,7 @@ namespace Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError($"ReceiveAsync failed, device: {_device.DeviceID}, exception: {ex.Message}");
+                        _logger.Error($"ReceiveAsync failed, device: {_device.DeviceID}, exception: {ex.Message}");
                         return null;
                     }
                 });
@@ -213,7 +212,7 @@ namespace Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError($"Abandon Command failed, device: {_device.DeviceID}, exception: {ex.Message}");
+                        _logger.Error($"Abandon Command failed, device: {_device.DeviceID}, exception: {ex.Message}");
                     }
                 });
         }
@@ -238,7 +237,7 @@ namespace Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError($"Complete Command failed, device: {_device.DeviceID}, exception: {ex.Message}");
+                        _logger.Error($"Complete Command failed, device: {_device.DeviceID}, exception: {ex.Message}");
                     }
                 });
         }
@@ -263,7 +262,7 @@ namespace Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError($"Reject Command failed, device: {_device.DeviceID}, exception: {ex.Message}");
+                        _logger.Error($"Reject Command failed, device: {_device.DeviceID}, exception: {ex.Message}");
                     }
                 });
         }
@@ -321,13 +320,13 @@ namespace Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob
 
                         _deviceClient = await CreateDeviceClient();
 
-                        _logger.LogInfo($"Transport opened for device {_device.DeviceID} with type {_transportType}");
+                        _logger.Info($"Transport opened for device {_device.DeviceID} with type {_transportType}");
                         isDeviceClientAvailable = true;
                         StateCollection<DeviceClientState>.Set(_device.DeviceID, DeviceClientState.Up);
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError($"Exception raised while trying to open transport for device {_device.DeviceID}: {ex}");
+                        _logger.Error($"Exception raised while trying to open transport for device {_device.DeviceID}: {ex}");
                         continue;
                     }
                 }
@@ -345,7 +344,7 @@ namespace Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError($"Exception raised while device {_device.DeviceID} trying to update reported properties: {ex}");
+                        _logger.Error($"Exception raised while device {_device.DeviceID} trying to update reported properties: {ex}");
                         isDeviceClientAvailable = false;
                         StateCollection<DeviceClientState>.Set(_device.DeviceID, DeviceClientState.Down);
                         continue;
@@ -368,7 +367,7 @@ namespace Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError($"Exception raised while device {_device.DeviceID} trying to send events: {ex}");
+                        _logger.Error($"Exception raised while device {_device.DeviceID} trying to send events: {ex}");
                         isDeviceClientAvailable = false;
                         StateCollection<DeviceClientState>.Set(_device.DeviceID, DeviceClientState.Down);
                         continue;

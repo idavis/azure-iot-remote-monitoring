@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Common.Configurations;
 using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Common.Models;
 using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Common.Repository;
-using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob.SimulatorCore.Logging;
+using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob.Logging;
 
 namespace Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob.SimulatorCore.Repository
 {
@@ -16,20 +16,19 @@ namespace Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob
     {
         private readonly string _hostName;
         private readonly List<InitialDeviceConfig> _devices;
-        private readonly ILogger _logger;
+        private readonly ILog _logger = LogProvider.GetCurrentClassLogger();
 
-        public AppConfigRepository(IConfigurationProvider configProvider, ILogger logger) 
+        public AppConfigRepository(IConfigurationProvider configProvider)
         {
             _devices = new List<InitialDeviceConfig>();
             _hostName = configProvider.GetConfigurationSettingValue("iotHub.HostName");
-            _logger = logger;
         }
 
         public async Task<List<InitialDeviceConfig>> GetDeviceListAsync()
         {
             return await Task.Run(() =>
             {
-                _logger.LogInfo("********** READING DEVICES FROM APP.CONFIG ********** ");
+                _logger.Info("********** READING DEVICES FROM APP.CONFIG ********** ");
                 if (_devices.Any())
                     return _devices;
 

@@ -2,9 +2,6 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob.SimulatorCore.Devices;
-using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob.SimulatorCore.Logging;
-using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob.SimulatorCore.Telemetry;
 using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob.Cooler.Telemetry;
 using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob.Cooler.Telemetry.Data;
 using Xunit;
@@ -15,16 +12,14 @@ namespace Microsoft.Azure.Devices.Applications.RemoteMonitoring.UnitTests.Simula
 {
     class RemoteMonitorTelemetryTests
     {
-        private Mock<ILogger> _loggerMock;
         private string testDeviceId;
         private RemoteMonitorTelemetry telemetry;
 
         public RemoteMonitorTelemetryTests()
         {
-            this._loggerMock = new Mock<ILogger>();
             this.testDeviceId = "testDeviceId";
 
-            this.telemetry = new RemoteMonitorTelemetry(this._loggerMock.Object, this.testDeviceId);
+            this.telemetry = new RemoteMonitorTelemetry(this.testDeviceId);
         }
 
         [Fact]

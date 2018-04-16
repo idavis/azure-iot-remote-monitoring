@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob.SimulatorCore.Logging;
+using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob.Logging;
 using Microsoft.Azure.Devices.Client;
 using Microsoft.Azure.Devices.Shared;
 using Newtonsoft.Json;
@@ -10,11 +10,10 @@ namespace Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob
 {
     public class EmptyTransport : ITransport
     {
-        private readonly ILogger _logger;
+        private readonly ILog _logger = LogProvider.GetCurrentClassLogger();
 
-        public EmptyTransport(ILogger logger)
+        public EmptyTransport()
         {
-            _logger = logger;
         }
 
         public async Task OpenAsync()
@@ -35,23 +34,24 @@ namespace Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob
 
         public async Task SendEventAsync(Guid eventId, dynamic eventData)
         {
-            _logger.LogInfo("SendEventAsync called:");
-            _logger.LogInfo("SendEventAsync: EventId: " + eventId.ToString());
-            _logger.LogInfo("SendEventAsync: message: " + eventData.ToString());
+            _logger.Info("SendEventAsync called:");
+            _logger.InfoFormat("SendEventAsync: EventId: {0}", eventId);
+            string eventString = eventData.ToString();
+            _logger.InfoFormat("SendEventAsync: message: {0}", eventString);
 
             await Task.FromResult(0);
         }
 
         public async Task SendEventBatchAsync(IEnumerable<Client.Message> messages)
         {
-            _logger.LogInfo("SendEventBatchAsync called");
+            _logger.Info("SendEventBatchAsync called");
 
             await Task.FromResult(0);
         }
 
         public async Task<DeserializableCommand> ReceiveAsync()
         {
-            _logger.LogInfo("ReceiveAsync: waiting...");
+            _logger.Info("ReceiveAsync: waiting...");
 
             return await Task.FromResult(new DeserializableCommand(new Client.Message()));
         }
@@ -88,29 +88,29 @@ namespace Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob
 
         public async Task UpdateReportedPropertiesAsync(TwinCollection reportedProperties)
         {
-            _logger.LogInfo("UpdateReportedPropertiesAsync called");
-            _logger.LogInfo($"UpdateReportedPropertiesAsync: reportedProperties: {reportedProperties.ToJson(Formatting.Indented)}");
+            _logger.Info("UpdateReportedPropertiesAsync called");
+            _logger.Info($"UpdateReportedPropertiesAsync: reportedProperties: {reportedProperties.ToJson(Formatting.Indented)}");
 
             await Task.FromResult(0);
         }
 
         public async Task<Twin> GetTwinAsync()
         {
-            _logger.LogInfo("GetTwinAsync called");
+            _logger.Info("GetTwinAsync called");
 
             return await Task.FromResult(new Twin());
         }
 
         public Task SetMethodHandlerAsync(string methodName, MethodCallback callback)
         {
-            _logger.LogInfo(FormattableString.Invariant($"SetMethodHandler called: {methodName} -> {callback.Method.Name}"));
+            _logger.Info(FormattableString.Invariant($"SetMethodHandler called: {methodName} -> {callback.Method.Name}"));
 
             return Task.FromResult(0);
         }
 
         public void SetDesiredPropertyUpdateCallback(DesiredPropertyUpdateCallback callback)
         {
-            _logger.LogInfo(FormattableString.Invariant($"SetDesiredPropertyUpdateCallback called, callback = {callback.Method.Name}"));
+            _logger.Info(FormattableString.Invariant($"SetDesiredPropertyUpdateCallback called, callback = {callback.Method.Name}"));
         }
     }
 }

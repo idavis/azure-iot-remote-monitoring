@@ -7,7 +7,7 @@ namespace Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob
 {
     public interface IDeviceFactory
     {
-        IDevice CreateDevice(Logging.ILogger logger, ITransportFactory transportFactory,
+        IDevice CreateDevice(ITransportFactory transportFactory,
             ITelemetryFactory telemetryFactory, IConfigurationProvider configurationProvider, InitialDeviceConfig config);
     }
 }

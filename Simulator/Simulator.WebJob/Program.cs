@@ -13,7 +13,6 @@ using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob.Coo
 using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob.Cooler.Telemetry.Factory;
 using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob.DataInitialization;
 using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob.SimulatorCore.Devices.Factory;
-using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob.SimulatorCore.Logging;
 using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob.SimulatorCore.Repository;
 using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob.SimulatorCore.Transport;
 using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob.SimulatorCore.Transport.Factory;
@@ -118,19 +117,18 @@ namespace Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator
         static void StartSimulator()
         {
             // Dependencies to inject into the Bulk Device Tester
-            var logger = new TraceLogger();
             var configProvider = new ConfigurationProvider();
             var tableStorageClientFactory = new AzureTableStorageClientFactory();
-            var telemetryFactory = new CoolerTelemetryFactory(logger);
+            var telemetryFactory = new CoolerTelemetryFactory();
 
-            var transportFactory = new IotHubTransportFactory(logger, configProvider);
+            var transportFactory = new IotHubTransportFactory(configProvider);
 
             IVirtualDeviceStorage deviceStorage = null;
             var useConfigforDeviceList = Convert.ToBoolean(configProvider.GetConfigurationSettingValueOrDefault("UseConfigForDeviceList", "False"), CultureInfo.InvariantCulture);
 
             if (useConfigforDeviceList)
             {
-                deviceStorage = new AppConfigRepository(configProvider, logger);
+                deviceStorage = new AppConfigRepository(configProvider);
             }
             else
             {
@@ -141,7 +139,7 @@ namespace Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator
 
             // Start Simulator
             Trace.TraceInformation("Starting Simulator");
-            var tester = new BulkDeviceTester(transportFactory, logger, configProvider, telemetryFactory, deviceFactory, deviceStorage);
+            var tester = new BulkDeviceTester(transportFactory, configProvider, telemetryFactory, deviceFactory, deviceStorage);
             Task.Run(() => tester.ProcessDevicesAsync(cancellationTokenSource.Token), cancellationTokenSource.Token);
         }
 

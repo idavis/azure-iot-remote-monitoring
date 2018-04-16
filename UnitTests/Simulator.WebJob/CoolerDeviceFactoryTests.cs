@@ -1,7 +1,6 @@
 ﻿using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Common.Configurations;
 using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Common.Models;
 using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob.Cooler.Devices.Factory;
-using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob.SimulatorCore.Logging;
 using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob.SimulatorCore.Telemetry.Factory;
 using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob.SimulatorCore.Transport.Factory;
 using Moq;
@@ -24,14 +23,13 @@ namespace Microsoft.Azure.Devices.Applications.RemoteMonitoring.UnitTests.Simula
         [Fact]
         public void CreateDeviceTest()
         {
-            var loggerMock = new Mock<ILogger>();
             var transportFactoryMock = new Mock<ITransportFactory>();
             var telemetryFactoryMock = new Mock<ITelemetryFactory>();
             var configurationProviderMock = new Mock<IConfigurationProvider>();
             var initialConfig = _fixture.Create<InitialDeviceConfig>();
 
 
-            var retDevice = _coolerDeviceFactory.CreateDevice(loggerMock.Object, transportFactoryMock.Object,
+            var retDevice = _coolerDeviceFactory.CreateDevice(transportFactoryMock.Object,
                 telemetryFactoryMock.Object, configurationProviderMock.Object, initialConfig);
             Assert.NotNull(retDevice);
         }

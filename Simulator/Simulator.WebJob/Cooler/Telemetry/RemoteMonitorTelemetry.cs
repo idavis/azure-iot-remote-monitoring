@@ -3,14 +3,14 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Common.SampleDataGenerator;
 using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob.Cooler.Telemetry.Data;
-using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob.SimulatorCore.Logging;
+using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob.Logging;
 using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob.SimulatorCore.Telemetry;
 
 namespace Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob.Cooler.Telemetry
 {
     public class RemoteMonitorTelemetry : ITelemetry, ITelemetryWithInterval, ITelemetryWithTemperatureMeanValue, ITelemetryFactoryResetSupport
     {
-        private readonly ILogger _logger;
+        private readonly ILog _logger = LogProvider.GetCurrentClassLogger();
         private readonly string _deviceId;
 
         private const uint REPORT_FREQUENCY_IN_SECONDS = 15;
@@ -38,9 +38,8 @@ namespace Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob
             }
         }
 
-        public RemoteMonitorTelemetry(ILogger logger, string deviceId)
+        public RemoteMonitorTelemetry(string deviceId)
         {
-            _logger = logger;
             _deviceId = deviceId;
 
             Reset();

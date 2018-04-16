@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Dynamic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Dynamic;
 using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Common.Configurations;
 using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Common.Models;
 using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob.Cooler.CommandProcessors;
 using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob.Cooler.Devices;
 using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob.SimulatorCore.CommandProcessors;
-using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob.SimulatorCore.Logging;
 using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob.SimulatorCore.Telemetry.Factory;
 using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob.SimulatorCore.Transport;
 using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob.SimulatorCore.Transport.Factory;
@@ -24,16 +18,14 @@ namespace Microsoft.Azure.Devices.Applications.RemoteMonitoring.UnitTests.Simula
         private Mock<CoolerDevice> _coolerDevice;
         private ChangeDeviceStateCommandProcessor _changeDeviceStateCommandProcessor;
         private Mock<IConfigurationProvider> _configurationProviderMock;
-        private Mock<ILogger> _loggerMock;
         private Mock<ITelemetryFactory> _telemetryFactoryMock;
         private Mock<ITransportFactory> _transportFactory;
         public ChangeDeviceStateCommandProcessorTests()
         {
-            _loggerMock = new Mock<ILogger>();
             _transportFactory = new Mock<ITransportFactory>();
             _telemetryFactoryMock = new Mock<ITelemetryFactory>();
             _configurationProviderMock = new Mock<IConfigurationProvider>();
-            _coolerDevice = new Mock<CoolerDevice>(_loggerMock.Object, _transportFactory.Object,
+            _coolerDevice = new Mock<CoolerDevice>(_transportFactory.Object,
                 _telemetryFactoryMock.Object,
                 _configurationProviderMock.Object);
             _changeDeviceStateCommandProcessor = new ChangeDeviceStateCommandProcessor(_coolerDevice.Object);

@@ -10,8 +10,8 @@ using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Common.Factory;
 using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Common.Helpers;
 using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Common.Models;
 using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Common.Models.Commands;
+using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob.Logging;
 using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob.SimulatorCore.CommandProcessors;
-using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob.SimulatorCore.Logging;
 using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob.SimulatorCore.Telemetry;
 using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob.SimulatorCore.Telemetry.Factory;
 using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob.SimulatorCore.Transport;
@@ -40,7 +40,7 @@ namespace Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob
         // pointer to the currently executing event group
         private int _currentEventGroup = 0;
 
-        protected readonly ILogger Logger;
+        protected readonly ILog Logger = LogProvider.GetCurrentClassLogger();
         protected readonly ITransportFactory TransportFactory;
         protected readonly ITelemetryFactory TelemetryFactory;
         protected readonly IConfigurationProvider ConfigProvider;
@@ -96,15 +96,14 @@ namespace Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob
         protected Dictionary<string, Func<object, Task>> _desiredPropertyUpdateHandlers = new Dictionary<string, Func<object, Task>>();
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="logger">Logger where this device will log information to</param>
         /// <param name="transport">Transport where the device will send and receive data to/from</param>
         /// <param name="config">Config to start this device with</param>
-        public DeviceBase(ILogger logger, ITransportFactory transportFactory, ITelemetryFactory telemetryFactory, IConfigurationProvider configurationProvider)
+        public DeviceBase(ITransportFactory transportFactory, ITelemetryFactory telemetryFactory, IConfigurationProvider configurationProvider)
         {
             ConfigProvider = configurationProvider;
-            Logger = logger;
             TransportFactory = transportFactory;
             TelemetryFactory = telemetryFactory;
             TelemetryEvents = new List<ITelemetry>();
@@ -142,7 +141,7 @@ namespace Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob
 
         public async virtual Task SendDeviceInfo()
         {
-            Logger.LogInfo("Sending Device Info for device {0}...", DeviceID);
+            Logger.InfoFormat("Sending Device Info for device {0}...", DeviceID);
             await Transport.SendEventAsync(GetDeviceInfo());
         }
 
@@ -188,7 +187,7 @@ namespace Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob
             }
             catch (Exception ex)
             {
-                Logger.LogError($"Exception raise while starting device {DeviceID}: {ex}");
+                Logger.Error($"Exception raise while starting device {DeviceID}: {ex}");
             }
             finally
             {
@@ -218,7 +217,7 @@ namespace Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob
         {
             try
             {
-                Logger.LogInfo("Booting device {0}...", DeviceID);
+                Logger.InfoFormat("Booting device {0}...", DeviceID);
 
                 var authMethod = new Client.DeviceAuthenticationWithRegistrySymmetricKey(DeviceID, PrimaryAuthKey);
                 var deviceConnectionString = Client.IotHubConnectionStringBuilder.Create(HostName, authMethod).ToString();
@@ -227,11 +226,11 @@ namespace Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob
                 {
                     _currentEventGroup = 0;
 
-                    Logger.LogInfo("Starting events list for device {0}...", DeviceID);
+                    Logger.InfoFormat("Starting events list for device {0}...", DeviceID);
 
                     while (_currentEventGroup < TelemetryEvents.Count && !token.IsCancellationRequested)
                     {
-                        Logger.LogInfo("Device {0} starting IEventGroup {1}...", DeviceID, _currentEventGroup);
+                        Logger.InfoFormat("Device {0} starting IEventGroup {1}...", DeviceID, _currentEventGroup);
 
                         var eventGroup = TelemetryEvents[_currentEventGroup];
 
@@ -243,11 +242,11 @@ namespace Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob
                         _currentEventGroup++;
                     }
 
-                    Logger.LogInfo("Device {0} finished sending all events in list...", DeviceID);
+                    Logger.InfoFormat("Device {0} finished sending all events in list...", DeviceID);
 
                 } while (RepeatEventListForever && !token.IsCancellationRequested);
 
-                Logger.LogWarning("Device {0} sent all events and is shutting down send loop. (Set RepeatEventListForever = true on the device to loop forever.)", DeviceID);
+                Logger.WarnFormat("Device {0} sent all events and is shutting down send loop. (Set RepeatEventListForever = true on the device to loop forever.)", DeviceID);
 
             }
             catch (TaskCanceledException)
@@ -256,12 +255,12 @@ namespace Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob
             }
             catch (Exception ex)
             {
-                Logger.LogError($"Exception raised while starting device send loop {DeviceID}: {ex.Message}");
+                Logger.Error($"Exception raised while starting device send loop {DeviceID}: {ex.Message}");
             }
 
             if (token.IsCancellationRequested)
             {
-                Logger.LogInfo("********** Processing Device {0} has been cancelled - StartSendLoopAsync Ending. **********", DeviceID);
+                Logger.InfoFormat("********** Processing Device {0} has been cancelled - StartSendLoopAsync Ending. **********", DeviceID);
             }
         }
 
@@ -284,7 +283,7 @@ namespace Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob
 
                     // Pause before running through the receive loop
                     await Task.Delay(TimeSpan.FromSeconds(10), token);
-                    Logger.LogInfo("Device {0} checking for commands...", DeviceID);
+                    Logger.InfoFormat("Device {0} checking for commands...", DeviceID);
 
                     try
                     {
@@ -313,7 +312,7 @@ namespace Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob
                                 break;
                         }
 
-                        Logger.LogInfo(
+                        Logger.InfoFormat(
                             "Device: {1}{0}Command: {2}{0}Lock token: {3}{0}Result: {4}{0}",
                             Console.Out.NewLine,
                             DeviceID,
@@ -325,7 +324,7 @@ namespace Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob
                     {
                         exception = ex;
 
-                        Logger.LogInfo(
+                        Logger.InfoFormat(
                             "Device: {1}{0}Command: {2}{0}Lock token: {3}{0}Error Type: {4}{0}Exception: {5}{0}",
                             Console.Out.NewLine,
                             DeviceID,
@@ -338,7 +337,7 @@ namespace Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob
                     {
                         exception = ex;
 
-                        Logger.LogInfo(
+                        Logger.InfoFormat(
                             "Device: {1}{0}Command: {2}{0}Lock token: {3}{0}Exception: {4}{0}",
                             Console.Out.NewLine,
                             DeviceID,
@@ -359,10 +358,10 @@ namespace Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob
             }
             catch (Exception ex)
             {
-                Logger.LogError($"Exception raised while starting device receive loop {DeviceID}: {ex}");
+                Logger.Error($"Exception raised while starting device receive loop {DeviceID}: {ex}");
             }
 
-            Logger.LogInfo("********** Processing Device {0} has been cancelled - StartReceiveLoopAsync Ending. **********", DeviceID);
+            Logger.InfoFormat("********** Processing Device {0} has been cancelled - StartReceiveLoopAsync Ending. **********", DeviceID);
         }
 
         protected async Task UpdateReportedPropertiesAsync(TwinCollection reported, bool regenerate = false)
@@ -453,7 +452,7 @@ namespace Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogError(FormattableString.Invariant($"Exception raised while adding callback for method {method.Name} on device {DeviceID}: {ex.Message}"));
+                    Logger.Error(FormattableString.Invariant($"Exception raised while adding callback for method {method.Name} on device {DeviceID}: {ex.Message}"));
                 }
             }
 
@@ -480,7 +479,7 @@ namespace Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob
         public async Task OnDesiredPropertyUpdate(TwinCollection desiredProperties, object userContext)
         {
             await SetReportedPropertyAsync(LastDesiredPropertyChangePropertyName, desiredProperties.ToJson());
-            Logger.LogInfo($"{DeviceID} received desired property update: {desiredProperties.ToJson()}");
+            Logger.Info($"{DeviceID} received desired property update: {desiredProperties.ToJson()}");
 
             foreach (var pair in desiredProperties.AsEnumerableFlatten())
             {
@@ -490,16 +489,16 @@ namespace Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob
                     try
                     {
                         await handler(pair.Value.Value.Value);
-                        Logger.LogInfo($"Successfully called desired property update handler {handler.Method.Name} on {DeviceID}");
+                        Logger.Info($"Successfully called desired property update handler {handler.Method.Name} on {DeviceID}");
                     }
                     catch (Exception ex)
                     {
-                        Logger.LogError($"Exception raised while processing desired property {pair.Key} change on device {DeviceID}: {ex.Message}");
+                        Logger.Error($"Exception raised while processing desired property {pair.Key} change on device {DeviceID}: {ex.Message}");
                     }
                 }
                 else
                 {
-                    Logger.LogWarning($"Cannot find desired property update handler for {pair.Key} on {DeviceID}");
+                    Logger.Warn($"Cannot find desired property update handler for {pair.Key} on {DeviceID}");
                 }
             }
         }

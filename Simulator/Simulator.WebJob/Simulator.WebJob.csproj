@@ -38,9 +38,11 @@
     <CodeAnalysisRuleSet>..\..\DeviceAdministration\DeviceAdministration.ruleset</CodeAnalysisRuleSet>
     <RunCodeAnalysis>true</RunCodeAnalysis>
     <UseVSHostingProcess>true</UseVSHostingProcess>
+    <DefineConstants>TRACE;DEBUG;CODE_ANALYSIS;LIBLOG_PUBLIC</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
     <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
+    <DefineConstants>TRACE;LIBLOG_PUBLIC</DefineConstants>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject>Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.Program</StartupObject>
@@ -168,6 +170,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="App_Packages\LibLog.4.2\LibLog.cs" />
     <Compile Include="BulkDeviceTester.cs" />
     <Compile Include="DataInitialization\DataInitializer.cs" />
     <Compile Include="DataInitialization\IDataInitializer.cs" />
@@ -203,8 +206,6 @@
     <Compile Include="Cooler\Devices\CoolerDevice.cs" />
     <Compile Include="SimulatorCore\Telemetry\ConcreteTelemetry.cs" />
     <Compile Include="SimulatorCore\Telemetry\ITelemetry.cs" />
-    <Compile Include="SimulatorCore\Logging\ILogger.cs" />
-    <Compile Include="SimulatorCore\Logging\TraceLogger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>

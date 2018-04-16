@@ -1,8 +1,6 @@
 ﻿using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Common.Configurations;
 using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Common.Models;
-using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob.SimulatorCore.Logging;
 using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob.SimulatorCore.Repository;
-using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob.SimulatorCore.Telemetry;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -14,7 +12,6 @@ namespace Microsoft.Azure.Devices.Applications.RemoteMonitoring.UnitTests.Simula
 {
     public class AppConfigRepositoryTests
     {
-        private readonly Mock<ILogger> _loggerMock;
         private readonly Mock<IConfigurationProvider> _configurationProviderMock;
         private AppConfigRepository repo;
 
@@ -24,7 +21,6 @@ namespace Microsoft.Azure.Devices.Applications.RemoteMonitoring.UnitTests.Simula
 
         public AppConfigRepositoryTests()
         {
-            this._loggerMock = new Mock<ILogger>();
             this._configurationProviderMock = new Mock<IConfigurationProvider>();
             this.testHostName = "testHostName";
             this.testKey = "testKey";
@@ -32,7 +28,7 @@ namespace Microsoft.Azure.Devices.Applications.RemoteMonitoring.UnitTests.Simula
 
             this._configurationProviderMock.Setup(mock => mock.GetConfigurationSettingValue("iotHub.HostName")).Returns(this.testHostName);
 
-            this.repo = new AppConfigRepository(this._configurationProviderMock.Object, this._loggerMock.Object);
+            this.repo = new AppConfigRepository(this._configurationProviderMock.Object);
         }
 
         [Fact]

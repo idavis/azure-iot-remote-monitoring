@@ -7,10 +7,10 @@ using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Common.Configuration
 using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Common.Extensions;
 using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob.Cooler.CommandProcessors;
 using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob.Cooler.Telemetry;
+using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob.Logging;
 using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob.SimulatorCore.CommandProcessors;
 using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob.SimulatorCore.Devices;
 using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob.SimulatorCore.Devices.DMTasks;
-using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob.SimulatorCore.Logging;
 using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob.SimulatorCore.Telemetry;
 using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob.SimulatorCore.Telemetry.Factory;
 using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob.SimulatorCore.Transport.Factory;
@@ -27,9 +27,9 @@ namespace Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob
     {
         private Task _deviceManagementTask = null;
 
-        public CoolerDevice(ILogger logger, ITransportFactory transportFactory,
+        public CoolerDevice(ITransportFactory transportFactory,
             ITelemetryFactory telemetryFactory, IConfigurationProvider configurationProvider)
-            : base(logger, transportFactory, telemetryFactory, configurationProvider)
+            : base(transportFactory, telemetryFactory, configurationProvider)
         {
             _desiredPropertyUpdateHandlers.Add(TemperatureMeanValuePropertyName, OnTemperatureMeanValueUpdate);
             _desiredPropertyUpdateHandlers.Add(TelemetryIntervalPropertyName, OnTelemetryIntervalUpdate);
@@ -61,7 +61,7 @@ namespace Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob
             var remoteMonitorTelemetry = (RemoteMonitorTelemetry)_telemetryController;
             bool lastStatus = remoteMonitorTelemetry.TelemetryActive;
             remoteMonitorTelemetry.TelemetryActive = true;
-            Logger.LogInfo("Device {0}: Telemetry has started", DeviceID);
+            Logger.InfoFormat("Device {0}: Telemetry has started", DeviceID);
 
             return lastStatus;
         }
@@ -71,7 +71,7 @@ namespace Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob
             var remoteMonitorTelemetry = (RemoteMonitorTelemetry)_telemetryController;
             bool lastStatus = remoteMonitorTelemetry.TelemetryActive;
             remoteMonitorTelemetry.TelemetryActive = false;
-            Logger.LogInfo("Device {0}: Telemetry has stopped", DeviceID);
+            Logger.InfoFormat("Device {0}: Telemetry has stopped", DeviceID);
 
             return lastStatus;
         }
@@ -80,7 +80,7 @@ namespace Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob
         {
             var remoteMonitorTelemetry = (RemoteMonitorTelemetry)_telemetryController;
             remoteMonitorTelemetry.TemperatureMeanValue = setPointTemp;
-            Logger.LogInfo("Device {0} temperature changed to {1}", DeviceID, setPointTemp);
+            Logger.InfoFormat("Device {0} temperature changed to {1}", DeviceID, setPointTemp);
         }
 
         public async Task ChangeDeviceState(string deviceState)
@@ -88,7 +88,7 @@ namespace Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob
             // simply update the DeviceState property and send updated device info packet
             DeviceProperties.DeviceState = deviceState;
             await SendDeviceInfo();
-            Logger.LogInfo("Device {0} in {1} state", DeviceID, deviceState);
+            Logger.InfoFormat("Device {0} in {1} state", DeviceID, deviceState);
         }
 
         public void DiagnosticTelemetry(bool active)
@@ -96,12 +96,12 @@ namespace Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob
             var remoteMonitorTelemetry = (RemoteMonitorTelemetry)_telemetryController;
             remoteMonitorTelemetry.ActivateExternalTemperature = active;
             string externalTempActive = active ? "on" : "off";
-            Logger.LogInfo("Device {0}: External Temperature: {1}", DeviceID, externalTempActive);
+            Logger.InfoFormat("Device {0}: External Temperature: {1}", DeviceID, externalTempActive);
         }
 
         public async Task<MethodResponse> OnChangeDeviceState(MethodRequest methodRequest, object userContext)
         {
-            Logger.LogInfo($"Method {methodRequest.Name} invoked on device {DeviceID}, payload: {methodRequest.DataAsJson}");
+            Logger.InfoFormat($"Method {methodRequest.Name} invoked on device {DeviceID}, payload: {methodRequest.DataAsJson}");
 
             await SetReportedPropertyAsync(DeviceStatePropertyName, methodRequest.DataAsJson);
 

@@ -1,6 +1,4 @@
-﻿using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Common.Models;
-using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob.SimulatorCore.Logging;
-using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob.SimulatorCore.Telemetry;
+﻿using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob.SimulatorCore.Telemetry;
 using Moq;
 using System;
 using System.Threading;
@@ -11,17 +9,15 @@ namespace Microsoft.Azure.Devices.Applications.RemoteMonitoring.UnitTests.Simula
 {
     public class ConcreteTelemetryTests
     {
-        private readonly Mock<ILogger> _loggerMock;
         private ConcreteTelemetry telemetry;
         private string testMessage;
 
         public ConcreteTelemetryTests()
         {
-            _loggerMock = new Mock<ILogger>();
-            this.telemetry = new ConcreteTelemetry(this._loggerMock.Object);
+            this.telemetry = new ConcreteTelemetry();
             this.testMessage = "test";
             this.telemetry.MessageBody = this.testMessage;
-            this.telemetry.DelayBefore = new System.TimeSpan(100);
+            this.telemetry.DelayBefore = new TimeSpan(100);
         }
 
         [Fact]
@@ -30,7 +26,7 @@ namespace Microsoft.Azure.Devices.Applications.RemoteMonitoring.UnitTests.Simula
             this.telemetry.RepeatForever = true;
             this.telemetry.RepeatCount = 1;
 
-            var foreverCount = 3; 
+            var foreverCount = 3;
             var i = 0;
 
             Func<object, Task> onSend = async (msg) =>
