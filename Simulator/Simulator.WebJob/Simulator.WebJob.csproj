@@ -38,11 +38,11 @@
     <CodeAnalysisRuleSet>..\..\DeviceAdministration\DeviceAdministration.ruleset</CodeAnalysisRuleSet>
     <RunCodeAnalysis>true</RunCodeAnalysis>
     <UseVSHostingProcess>true</UseVSHostingProcess>
-    <DefineConstants>TRACE;DEBUG;CODE_ANALYSIS;LIBLOG_PUBLIC</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;CODE_ANALYSIS</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
     <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
-    <DefineConstants>TRACE;LIBLOG_PUBLIC</DefineConstants>
+    <DefineConstants>TRACE</DefineConstants>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject>Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.Program</StartupObject>
@@ -170,7 +170,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="App_Packages\LibLog.4.2\LibLog.cs" />
     <Compile Include="BulkDeviceTester.cs" />
     <Compile Include="DataInitialization\DataInitializer.cs" />
     <Compile Include="DataInitialization\IDataInitializer.cs" />

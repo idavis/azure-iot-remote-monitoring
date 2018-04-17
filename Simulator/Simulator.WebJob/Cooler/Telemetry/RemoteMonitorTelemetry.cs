@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Common.Logging;
 using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Common.SampleDataGenerator;
 using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob.Cooler.Telemetry.Data;
-using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob.Logging;
 using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob.SimulatorCore.Telemetry;
 
 namespace Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob.Cooler.Telemetry

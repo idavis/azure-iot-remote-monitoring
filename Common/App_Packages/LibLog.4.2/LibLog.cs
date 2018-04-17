@@ -40,23 +40,23 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-[assembly: SuppressMessage("Microsoft.Design", "CA1020:AvoidNamespacesWithFewTypes", Scope = "namespace", Target = "Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob.Logging")]
-[assembly: SuppressMessage("Microsoft.Design", "CA1026:DefaultParametersShouldNotBeUsed", Scope = "member", Target = "Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob.Logging.Logger.#Invoke(Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob.Logging.LogLevel,System.Func`1<System.String>,System.Exception,System.Object[])")]
+[assembly: SuppressMessage("Microsoft.Design", "CA1020:AvoidNamespacesWithFewTypes", Scope = "namespace", Target = "Microsoft.Azure.Devices.Applications.RemoteMonitoring.Common.Logging")]
+[assembly: SuppressMessage("Microsoft.Design", "CA1026:DefaultParametersShouldNotBeUsed", Scope = "member", Target = "Microsoft.Azure.Devices.Applications.RemoteMonitoring.Common.Logging.Logger.#Invoke(Microsoft.Azure.Devices.Applications.RemoteMonitoring.Common.Logging.LogLevel,System.Func`1<System.String>,System.Exception,System.Object[])")]
 
 // If you copied this file manually, you need to change all "YourRootNameSpace" so not to clash with other libraries
 // that use LibLog
 #if LIBLOG_PROVIDERS_ONLY
-namespace Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob.LibLog
+namespace Microsoft.Azure.Devices.Applications.RemoteMonitoring.Common.LibLog
 #else
-namespace Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob.Logging
+namespace Microsoft.Azure.Devices.Applications.RemoteMonitoring.Common.Logging
 #endif
 {
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
 #if LIBLOG_PROVIDERS_ONLY
-    using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob.LibLog.LogProviders;
+    using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Common.LibLog.LogProviders;
 #else
-    using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob.Logging.LogProviders;
+    using Microsoft.Azure.Devices.Applications.RemoteMonitoring.Common.Logging.LogProviders;
 #endif
     using System;
 #if !LIBLOG_PROVIDERS_ONLY
@@ -714,9 +714,9 @@ namespace Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob
 }
 
 #if LIBLOG_PROVIDERS_ONLY
-namespace Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob.LibLog.LogProviders
+namespace Microsoft.Azure.Devices.Applications.RemoteMonitoring.Common.LibLog.LogProviders
 #else
-namespace Microsoft.Azure.Devices.Applications.RemoteMonitoring.Simulator.WebJob.Logging.LogProviders
+namespace Microsoft.Azure.Devices.Applications.RemoteMonitoring.Common.Logging.LogProviders
 #endif
 {
     using System;
